@@ -14,7 +14,7 @@ export default function Footer() {
           
           {/* Logo & Info */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <div style={{
+            {/* <div style={{
               width: '32px',
               height: '32px',
               borderRadius: '8px',
@@ -26,7 +26,7 @@ export default function Footer() {
               fontWeight: 'bold'
             }}>
               <BarChart2 size={18} />
-            </div>
+            </div> */}
             <span style={{ fontFamily: 'var(--font-heading)', fontWeight: '700', color: '#fff', fontSize: '1rem' }}>
               SAMSON OLOYEDE <span style={{ color: 'var(--accent-cyan)' }}>• PORTFOLIO</span>
             </span>
