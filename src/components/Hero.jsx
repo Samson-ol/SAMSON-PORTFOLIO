@@ -43,7 +43,7 @@ export default function Hero({ onOpenResume, heroImage, onOpenAdmin }) {
 
             {/* Hoverable Tech Stack Badges */}
             <div className="hero-tech-group" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', alignItems: 'center' }}>
-              <span style={{ color: 'var(--text-subtle)', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600', marginRight: '0.4rem' }}>
+              <span className="hero-tech-label" style={{ color: 'var(--text-subtle)', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600', marginRight: '0.4rem' }}>
                 Core Toolbelt:
               </span>
               {TECH_STACK.map((tech, idx) => (
@@ -147,6 +147,13 @@ export default function Hero({ onOpenResume, heroImage, onOpenAdmin }) {
           .hero-btn-group, .hero-tech-group {
             justify-content: center !important;
           }
+          .hero-tech-label {
+            display: block !important;
+            width: 100% !important;
+            text-align: center !important;
+            margin-right: 0 !important;
+            margin-bottom: 0.5rem !important;
+          }
         }
 
         @media (max-width: 640px) {
@@ -171,6 +178,17 @@ export default function Hero({ onOpenResume, heroImage, onOpenAdmin }) {
           .hero-image-card {
             max-width: 310px !important;
             max-height: 380px !important;
+          }
+          .hero-tech-group {
+            justify-content: center !important;
+            gap: 0.5rem !important;
+          }
+          .hero-tech-label {
+            display: block !important;
+            width: 100% !important;
+            text-align: center !important;
+            margin-right: 0 !important;
+            margin-bottom: 0.4rem !important;
           }
         }
       `}</style>

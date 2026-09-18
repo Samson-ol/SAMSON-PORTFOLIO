@@ -40,6 +40,7 @@ export default function AdminPanel({ isOpen, onClose, projects, setProjects, her
   const [isUploadingResume, setIsUploadingResume] = useState(false);
   const [isUploadingPbix, setIsUploadingPbix] = useState(false);
   const [isUploadingExcel, setIsUploadingExcel] = useState(false);
+  const [isUploadingDashboardImage, setIsUploadingDashboardImage] = useState(false);
   const [isSavingProject, setIsSavingProject] = useState(false);
 
   // Authentication State
@@ -60,6 +61,7 @@ export default function AdminPanel({ isOpen, onClose, projects, setProjects, her
     domain: 'SaaS & Subscription',
     shortDesc: '',
     documentation: '', // Detailed analysis walkthrough & summary
+    dashboardImage: '',
     selectedTools: ['Excel', 'Power BI'],
     githubUrl: '',
     demoUrl: '',
@@ -194,6 +196,27 @@ export default function AdminPanel({ isOpen, onClose, projects, setProjects, her
     }
   };
 
+  const handleDashboardImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setIsUploadingDashboardImage(true);
+      try {
+        const result = await uploadToCloudinary(file);
+        setNewProject(prev => ({
+          ...prev,
+          dashboardImage: result.url
+        }));
+        setSavedMessage(`Dashboard preview screenshot uploaded to Cloudinary!`);
+      } catch (err) {
+        console.error("Dashboard image upload error:", err);
+        setSavedMessage('Failed to upload dashboard screenshot.');
+      } finally {
+        setIsUploadingDashboardImage(false);
+        setTimeout(() => setSavedMessage(''), 4000);
+      }
+    }
+  };
+
   const handleExcelFileUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -293,6 +316,7 @@ export default function AdminPanel({ isOpen, onClose, projects, setProjects, her
         domain: newProject.domain,
         shortDesc: newProject.shortDesc,
         documentation: newProject.documentation,
+        dashboardImage: newProject.dashboardImage || null,
         tools: newProject.selectedTools.length > 0 ? newProject.selectedTools : ['Excel', 'Power BI'],
         githubUrl: newProject.githubUrl,
         demoUrl: newProject.demoUrl,
@@ -330,6 +354,7 @@ export default function AdminPanel({ isOpen, onClose, projects, setProjects, her
         domain: 'SaaS & Subscription',
         shortDesc: '',
         documentation: '',
+        dashboardImage: '',
         selectedTools: ['Excel', 'Power BI'],
         githubUrl: '',
         demoUrl: '',
@@ -721,6 +746,36 @@ export default function AdminPanel({ isOpen, onClose, projects, setProjects, her
                     {newProject.excelFile && (
                       <div style={{ fontSize: '0.78rem', color: 'var(--accent-emerald)', marginTop: '0.3rem', fontWeight: '600' }}>
                         ✓ {newProject.excelFile.name} ({newProject.excelFile.size}) Parsed
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Upload Dashboard Screenshot / Preview Image */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                      Dashboard Screenshot / Preview Image:
+                    </label>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleDashboardImageUpload}
+                      style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }} 
+                    />
+                    {isUploadingDashboardImage && (
+                      <div style={{ fontSize: '0.78rem', color: 'var(--accent-cyan)', marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                        <Loader2 size={12} className="spin-icon" /> Uploading image to Cloudinary...
+                      </div>
+                    )}
+                    {newProject.dashboardImage && (
+                      <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <img src={newProject.dashboardImage} alt="Dashboard preview" style={{ width: '80px', height: '50px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border-color)' }} />
+                        <button 
+                          type="button" 
+                          onClick={() => setNewProject({ ...newProject, dashboardImage: '' })}
+                          style={{ background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)', color: '#ef4444', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                          Remove Image
+                        </button>
                       </div>
                     )}
                   </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, Code2, Terminal, Table, Copy, Check, FileText, Lightbulb, ExternalLink, Code, Download, FileSpreadsheet, Layers, BookOpen } from 'lucide-react';
+import { X, CheckCircle2, Code2, Terminal, Table, Copy, Check, FileText, Lightbulb, ExternalLink, Code, Download, FileSpreadsheet, Layers, BookOpen, BarChart2 } from 'lucide-react';
 import { marked } from 'marked';
 
 // Configure marked options
@@ -130,6 +130,31 @@ export default function ProjectModal({ project, onClose }) {
         {activeTab === 'star' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             
+            {/* Dashboard Screenshot / Visual Preview */}
+            {project.dashboardImage && (
+              <div className="glass-card" style={{ padding: '1.25rem', background: '#070a12', border: '1px solid rgba(0,242,254,0.3)', borderRadius: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
+                  <div style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <BarChart2 size={18} /> Interactive Dashboard Screenshot
+                  </div>
+                  <a href={project.dashboardImage} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.78rem' }}>
+                    <ExternalLink size={13} /> Open Fullscreen Image
+                  </a>
+                </div>
+                <div 
+                  style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', background: '#050810' }}
+                  onClick={() => window.open(project.dashboardImage, '_blank')}
+                  title="Click to view high-resolution dashboard"
+                >
+                  <img 
+                    src={project.dashboardImage} 
+                    alt={`${project.title} Dashboard Screenshot`} 
+                    style={{ width: '100%', maxHeight: '550px', objectFit: 'contain', display: 'block' }} 
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Custom Documentation / Analysis Summary if provided */}
             {project.documentation && project.documentation.trim().length > 0 && (
               <div className="glass-card" style={{ padding: '1.5rem', background: 'linear-gradient(135deg, rgba(0,242,254,0.06) 0%, rgba(139,92,246,0.06) 100%)', border: '1px solid rgba(0,242,254,0.25)' }}>

@@ -60,6 +60,32 @@ export default function CaseStudyGallery({ onSelectProject, customProjects }) {
                 overflow: 'hidden'
               }}
             >
+              {/* Dashboard Preview Banner if provided */}
+              {project.dashboardImage && (
+                <div 
+                  style={{ 
+                    width: 'calc(100% + 4rem)', 
+                    margin: '-2rem -2rem 1.25rem -2rem', 
+                    height: '180px', 
+                    overflow: 'hidden', 
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => onSelectProject(project)}
+                >
+                  <img 
+                    src={project.dashboardImage} 
+                    alt={project.title} 
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover', 
+                      display: 'block' 
+                    }} 
+                  />
+                </div>
+              )}
+
               <div>
                 {/* Domain Pill */}
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
