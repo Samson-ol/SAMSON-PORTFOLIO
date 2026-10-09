@@ -91,10 +91,76 @@ export async function addProjectToDB(projectData) {
 }
 
 /**
+ * Update an existing project in Firestore
+ */
+export async function updateProjectInDB(projectId, projectData) {
+  const docRef = doc(db, 'projects', projectId);
+  await setDoc(docRef, {
+    ...projectData,
+    updatedAt: new Date().toISOString()
+  }, { merge: true });
+}
+
+/**
  * Delete a project from Firestore
  */
 export async function deleteProjectFromDB(projectId) {
   const docRef = doc(db, 'projects', projectId);
+  await deleteDoc(docRef);
+}
+
+/**
+ * Subscribe to realtime updates for experiences list in Firestore
+ */
+export function subscribeToExperiences(callback) {
+  const expRef = collection(db, 'experiences');
+  return onSnapshot(expRef, (snapshot) => {
+    const list = [];
+    snapshot.forEach(docSnap => {
+      list.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    // Automatic sorting: Most recent experience at the top!
+    list.sort((a, b) => {
+      if (a.isCurrent && !b.isCurrent) return -1;
+      if (!a.isCurrent && b.isCurrent) return 1;
+      const dateA = a.startDate ? new Date(a.startDate) : new Date(0);
+      const dateB = b.startDate ? new Date(b.startDate) : new Date(0);
+      return dateB - dateA;
+    });
+    callback(list);
+  }, (error) => {
+    console.error("Firestore experiences subscription error:", error);
+  });
+}
+
+/**
+ * Save a new experience entry to Firestore
+ */
+export async function addExperienceToDB(expData) {
+  const expRef = collection(db, 'experiences');
+  const docRef = await addDoc(expRef, {
+    ...expData,
+    createdAt: new Date().toISOString()
+  });
+  return docRef.id;
+}
+
+/**
+ * Update an experience entry in Firestore
+ */
+export async function updateExperienceInDB(expId, expData) {
+  const docRef = doc(db, 'experiences', expId);
+  await setDoc(docRef, {
+    ...expData,
+    updatedAt: new Date().toISOString()
+  }, { merge: true });
+}
+
+/**
+ * Delete an experience entry from Firestore
+ */
+export async function deleteExperienceFromDB(expId) {
+  const docRef = doc(db, 'experiences', expId);
   await deleteDoc(docRef);
 }
 

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import About from './components/About';
+import Experience from './components/Experience';
 import CaseStudyGallery from './components/CaseStudyGallery';
 import ProjectModal from './components/ProjectModal';
 import SkillsMatrix from './components/SkillsMatrix';
@@ -9,7 +11,7 @@ import AdminPanel from './components/AdminPanel';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import { CASE_STUDIES } from './data/mockData';
-import { subscribeToProjects, subscribeToProfileSettings, saveProfileSettingsToDB } from './services/firebase';
+import { subscribeToProjects, subscribeToProfileSettings, subscribeToExperiences, saveProfileSettingsToDB } from './services/firebase';
 
 export default function App() {
   const [selectedProject, setSelectedProject] = useState(null);
@@ -37,6 +39,12 @@ export default function App() {
   const [resumeUrl, setResumeUrl] = useState(() => {
     return localStorage.getItem('samson_resume_url') || '';
   });
+
+  const [aboutBio, setAboutBio] = useState(() => {
+    return localStorage.getItem('samson_about_bio') || '';
+  });
+
+  const [experiences, setExperiences] = useState([]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -70,7 +78,14 @@ export default function App() {
       }
     });
 
-    // Realtime Profile Settings Subscription (hero photo, resume URL)
+    // Realtime Experiences Subscription from Firestore
+    const unsubExp = subscribeToExperiences((remoteExp) => {
+      if (remoteExp) {
+        setExperiences(remoteExp);
+      }
+    });
+
+    // Realtime Profile Settings Subscription (hero photo, resume URL, about bio)
     const unsubSettings = subscribeToProfileSettings((remoteSettings) => {
       if (remoteSettings) {
         if (remoteSettings.heroImage !== undefined) {
@@ -81,6 +96,10 @@ export default function App() {
           setResumeUrl(remoteSettings.resumeUrl);
           try { localStorage.setItem('samson_resume_url', remoteSettings.resumeUrl); } catch (e) {}
         }
+        if (remoteSettings.aboutBio !== undefined) {
+          setAboutBio(remoteSettings.aboutBio);
+          try { localStorage.setItem('samson_about_bio', remoteSettings.aboutBio); } catch (e) {}
+        }
       }
     });
 
@@ -88,6 +107,7 @@ export default function App() {
       window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('keydown', handleKeyDown);
       unsubProjects();
+      unsubExp();
       unsubSettings();
     };
   }, []);
@@ -115,13 +135,22 @@ export default function App() {
           onOpenResume={() => setResumeOpen(true)} 
           heroImage={heroImage}
         />
+
+        <About 
+          aboutBio={aboutBio}
+        />
         
+        <Experience 
+          experiences={experiences}
+        />
+
+        <SkillsMatrix />
+
         <CaseStudyGallery 
           onSelectProject={(project) => setSelectedProject(project)} 
           customProjects={projects}
         />
 
-        <SkillsMatrix />
         <Contact />
       </main>
 
@@ -149,6 +178,10 @@ export default function App() {
         setHeroImage={setHeroImage}
         resumeUrl={resumeUrl}
         setResumeUrl={setResumeUrl}
+        aboutBio={aboutBio}
+        setAboutBio={setAboutBio}
+        experiences={experiences}
+        setExperiences={setExperiences}
       />
     </div>
   );
