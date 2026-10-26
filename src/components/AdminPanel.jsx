@@ -208,15 +208,18 @@ export default function AdminPanel({
         const result = await uploadToCloudinary(file);
         setTempResumeUrl(result.url);
         setResumeUrl(result.url);
+        try {
+          localStorage.setItem('samson_resume_url', result.url);
+        } catch (e) {}
         await saveProfileSettingsToDB({ resumeUrl: result.url });
-        setSavedMessage('PDF Resume uploaded to Cloudinary & saved to Database!');
+        setSavedMessage(`Resume "${file.name}" uploaded to Cloudinary & saved!`);
         confetti({ particleCount: 50, spread: 50 });
       } catch (err) {
         console.error("Resume upload failed:", err);
-        setSavedMessage('Failed to upload resume to Cloudinary.');
+        setSavedMessage('Failed to upload resume to Cloudinary: ' + (err.message || 'Check connection'));
       } finally {
         setIsUploadingResume(false);
-        setTimeout(() => setSavedMessage(''), 4000);
+        setTimeout(() => setSavedMessage(''), 5000);
       }
     }
   };
@@ -799,10 +802,34 @@ export default function AdminPanel({
                     <FileText size={18} style={{ color: 'var(--accent-purple)' }} /> Official PDF Resume Attachment
                   </h3>
 
-                  <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div style={{ display: 'grid', gap: '1.25rem' }}>
+                    {tempResumeUrl ? (
+                      <div style={{ background: 'rgba(0, 242, 254, 0.06)', border: '1px solid rgba(0, 242, 254, 0.25)', borderRadius: 'var(--radius-sm)', padding: '0.85rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0 }}>
+                          <Check size={16} style={{ color: 'var(--accent-cyan)', flexShrink: 0 }} />
+                          <div style={{ fontSize: '0.85rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '380px' }}>
+                            <span style={{ color: 'var(--accent-cyan)', fontWeight: '600' }}>Active Resume:</span> {tempResumeUrl}
+                          </div>
+                        </div>
+                        <a 
+                          href={tempResumeUrl} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="btn btn-outline" 
+                          style={{ padding: '0.35rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                        >
+                          <ExternalLink size={13} /> Test / View Resume
+                        </a>
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                        No resume attached yet. Upload a PDF file or paste a direct URL below.
+                      </div>
+                    )}
+
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
-                        Upload Official Resume PDF File:
+                        Upload New Resume PDF File:
                       </label>
                       <input type="file" accept="application/pdf" onChange={handleResumeFileUpload} disabled={isUploadingResume} style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }} />
                       {isUploadingResume && (
@@ -810,6 +837,19 @@ export default function AdminPanel({
                           <Loader2 size={14} className="spin-icon" /> Uploading PDF resume to Cloudinary...
                         </div>
                       )}
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                        Or Paste Direct Resume PDF URL:
+                      </label>
+                      <input 
+                        type="text" 
+                        placeholder="https://res.cloudinary.com/.../resume.pdf" 
+                        value={tempResumeUrl} 
+                        onChange={(e) => setTempResumeUrl(e.target.value)} 
+                        style={{ width: '100%', background: '#070a10', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '0.6rem', color: '#fff', outline: 'none', fontSize: '0.88rem' }} 
+                      />
                     </div>
                   </div>
                 </div>
